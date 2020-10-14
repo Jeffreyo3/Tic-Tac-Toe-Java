@@ -60,6 +60,7 @@ public class GUI {
                 board.addUserChoice(Integer.parseInt(b.getName()));
                 String result = board.checkWinner();
                 if (result.length() > 0) {
+                    JOptionPane.showMessageDialog(null, result);
                     System.out.println(result);
                 } else {
                     GameBoard.computerTurn(board);

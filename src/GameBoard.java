@@ -121,6 +121,7 @@ public class GameBoard {
         board.addCpuChoice(Integer.parseInt(cpuChoice));
         String result = board.checkWinner();
         if (result.length() > 0) {
+            JOptionPane.showMessageDialog(null, result);
             System.out.println(result);
         }
     }
