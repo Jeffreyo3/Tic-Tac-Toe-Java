@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -7,48 +9,48 @@ public class GUI implements ActionListener {
     private static JTextField userText;
     private static JTextField passInput;
     private static JLabel success;
+    private JPanel tttBoard;
 
 
     public static void main(String[] args) {
-        JPanel panel = new JPanel();
+        JPanel gui = new JPanel(new BorderLayout(3, 3));
         JFrame frame = new JFrame();
-        frame.setSize(350, 200);
+        frame.setSize(600, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(panel);
+        frame.add(gui);
 
-        panel.setLayout(null);
+//        gui.setLayout(null);
 
-        JLabel userLabel = new JLabel("User");
-        userLabel.setBounds(10, 20, 80, 25);
-        panel.add(userLabel);
 
-        userText = new JTextField(20);
-        userText.setBounds(100, 20, 165, 25);
-        panel.add(userText);
+        JPanel tttBoard = new JPanel(new GridLayout(0,5));
+        tttBoard.setBorder(new LineBorder(Color.BLACK));
+        gui.add(tttBoard);
 
-        JLabel passLabel = new JLabel("Password");
-        passLabel.setBounds(10, 50, 80, 25);
-        panel.add(passLabel);
-
-        passInput = new JPasswordField(20);
-        passInput.setBounds(100, 50, 165, 25);
-        panel.add(passInput);
-
-        JButton button = new JButton("Submit");
-        button.setBounds(10, 80, 80, 25);
-        button.addActionListener(new GUI());
-        panel.add(button);
-
-        success = new JLabel("");
-        success.setBounds(10, 110, 300, 25);
-        panel.add(success);
-
-        frame.setVisible(true);
 
         GameBoard board = new GameBoard();
         char [][] layout = board.getGameBoard();
-        System.out.println(board);
+        System.out.println(layout.length);
         System.out.println(layout[0].length);
+
+        // TODO render data to screen
+        Insets bMargin = new Insets(0,0,0,0);
+        int count = 0;
+        for (char[] rows : layout) {
+            for (char c : rows) {
+                JButton b = new JButton();
+                b.setMargin(bMargin);
+                b.setSize(4, 4);
+                b.setBackground(Color.BLACK);
+                b.setText(Character.toString(c));
+                b.setForeground(Color.WHITE);
+                b.setFont(new Font("Arial", Font.PLAIN, 40));
+                count++;
+                System.out.println(count);
+                tttBoard.add(b);
+            }
+        }
+
+        frame.setVisible(true);
     }
 
     @Override
