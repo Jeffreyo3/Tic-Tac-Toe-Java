@@ -4,11 +4,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+import java.util.Random;
 
 public class GUI {
 
-    private static JPanel gui;
-    private static JFrame frame;
     private static JPanel tttBoard;
     private static GameBoard board;
     private static HashMap componentMap;
@@ -18,15 +17,33 @@ public class GUI {
         board = new GameBoard();
         makeGameBoard();
         createComponentMap();
-        System.out.println(getComponentByName("4"));
+        computerTurn();
+
+    }
+
+    private static void computerTurn() {
+        Random rNum = new Random();
+        String cpuChoice = Integer.toString(rNum.nextInt(8));
+        Component findButton = getComponentByName(cpuChoice);
+        String text = ((JButton)findButton).getText();
+
+        while (!checkSelected(text)) {
+            cpuChoice = Integer.toString(rNum.nextInt(8));
+            findButton = getComponentByName(cpuChoice);
+            text = ((JButton)findButton).getText();
+            System.out.println("hi");
+            System.out.println(cpuChoice);
+        }
+        ((JButton)findButton).setText("O");
+        ((JButton)findButton).setForeground(Color.ORANGE);
 
     }
 
     private static void createComponentMap() {
         componentMap = new HashMap<String, JButton>();
         Component[] buttons = tttBoard.getComponents();
-        for(int i=0; i<buttons.length; i++) {
-            componentMap.put(buttons[i].getName(), buttons[i]);
+        for (Component button : buttons) {
+            componentMap.put(button.getName(), button);
         }
     }
 
@@ -38,12 +55,12 @@ public class GUI {
     }
 
     public static void makeGameBoard() {
-        gui = new JPanel(new BorderLayout(3, 3));
-        frame = new JFrame();
+        JPanel gui = new JPanel(new BorderLayout(3, 3));
+        JFrame frame = new JFrame();
         frame.setSize(400, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(gui);
-        frame.setTitle("Tic-Tac-Toe by jeffreyo3");
+        frame.setTitle("Tic-Tac-Toe by Jeffrey-O");
 
         tttBoard = new JPanel(new GridLayout(0,3));
         tttBoard.setBorder(new LineBorder(Color.BLACK));
@@ -64,25 +81,25 @@ public class GUI {
                 b.addActionListener(selectMove(b));
                 tttBoard.add(b);
 
-                System.out.println(count);
                 count++;
             }
         }
         frame.setVisible(true);
     }
 
-    private static ActionListener selectMove(JButton b) {
-        ActionListener action = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String curr = b.getText();
-                if (!curr.contains("X") && !curr.contains("O")) {
-                    b.setText("X");
-                    System.out.println("hi");
-                }
+    private static boolean checkSelected (String bTxt) {
+        System.out.println("checkSelected Text: " + bTxt);
+        Boolean bool = (!bTxt.contains("X") && !bTxt.contains("O"));
+        System.out.println(bool);
+        return bool;
+    }
 
+    private static ActionListener selectMove(JButton b) {
+        return e -> {
+            if (checkSelected(b.getText())) {
+                b.setText("X");
+                b.setForeground(Color.CYAN);
             }
         };
-        return action;
     }
 }
