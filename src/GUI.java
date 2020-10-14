@@ -15,17 +15,13 @@ public class GUI implements ActionListener {
     public static void main(String[] args) {
         JPanel gui = new JPanel(new BorderLayout(3, 3));
         JFrame frame = new JFrame();
-        frame.setSize(600, 600);
+        frame.setSize(400, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(gui);
 
-//        gui.setLayout(null);
-
-
-        JPanel tttBoard = new JPanel(new GridLayout(0,5));
+        JPanel tttBoard = new JPanel(new GridLayout(0,3));
         tttBoard.setBorder(new LineBorder(Color.BLACK));
         gui.add(tttBoard);
-
 
         GameBoard board = new GameBoard();
         char [][] layout = board.getGameBoard();
@@ -33,24 +29,39 @@ public class GUI implements ActionListener {
         System.out.println(layout[0].length);
 
         // TODO render data to screen
-        Insets bMargin = new Insets(0,0,0,0);
         int count = 0;
         for (char[] rows : layout) {
             for (char c : rows) {
                 JButton b = new JButton();
-                b.setMargin(bMargin);
-                b.setSize(4, 4);
                 b.setBackground(Color.BLACK);
                 b.setText(Character.toString(c));
                 b.setForeground(Color.WHITE);
                 b.setFont(new Font("Arial", Font.PLAIN, 40));
-                count++;
-                System.out.println(count);
+                b.setFocusPainted(false);
+                b.setFocusable(false);
+
+                b.setName(Integer.toString(count));
+
+//                for (int e : board.getIntArray()) {
+//                    if (e == count) {
+//                        b.setName(Integer.toString(num));
+//                        b.setFocusable(true);
+//                        b.setSize(4, 4);
+//                    }
+//                }
+
                 tttBoard.add(b);
+
+                System.out.println(count);
+                count++;
             }
         }
 
         frame.setVisible(true);
+    }
+
+    public void makeGameBoard() {
+
     }
 
     @Override
