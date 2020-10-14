@@ -22,7 +22,7 @@ public class GameBoard {
 
     private char [][] gameBoard = {
             {' ', ' ', ' '},
-            {' ', ' ', ' '},
+            {' ', 'O', ' '},
             {' ', ' ', ' '},
     };
 

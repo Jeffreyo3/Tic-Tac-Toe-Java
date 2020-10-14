@@ -3,34 +3,54 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
-public class GUI implements ActionListener {
+public class GUI {
 
-    private static JTextField userText;
-    private static JTextField passInput;
-    private static JLabel success;
-    private JPanel tttBoard;
-
+    private static JPanel gui;
+    private static JFrame frame;
+    private static JPanel tttBoard;
+    private static GameBoard board;
+    private static HashMap componentMap;
 
     public static void main(String[] args) {
-        JPanel gui = new JPanel(new BorderLayout(3, 3));
-        JFrame frame = new JFrame();
+
+        board = new GameBoard();
+        makeGameBoard();
+        createComponentMap();
+        System.out.println(getComponentByName("4"));
+
+    }
+
+    private static void createComponentMap() {
+        componentMap = new HashMap<String, JButton>();
+        Component[] buttons = tttBoard.getComponents();
+        for(int i=0; i<buttons.length; i++) {
+            componentMap.put(buttons[i].getName(), buttons[i]);
+        }
+    }
+
+    private static Component getComponentByName(String name) {
+        if (componentMap.containsKey(name)) {
+            return (Component) componentMap.get(name);
+        }
+        else return null;
+    }
+
+    public static void makeGameBoard() {
+        gui = new JPanel(new BorderLayout(3, 3));
+        frame = new JFrame();
         frame.setSize(400, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(gui);
+        frame.setTitle("Tic-Tac-Toe by jeffreyo3");
 
-        JPanel tttBoard = new JPanel(new GridLayout(0,3));
+        tttBoard = new JPanel(new GridLayout(0,3));
         tttBoard.setBorder(new LineBorder(Color.BLACK));
         gui.add(tttBoard);
 
-        GameBoard board = new GameBoard();
-        char [][] layout = board.getGameBoard();
-        System.out.println(layout.length);
-        System.out.println(layout[0].length);
-
-        // TODO render data to screen
         int count = 0;
-        for (char[] rows : layout) {
+        for (char[] rows : board.getGameBoard()) {
             for (char c : rows) {
                 JButton b = new JButton();
                 b.setBackground(Color.BLACK);
@@ -39,40 +59,30 @@ public class GUI implements ActionListener {
                 b.setFont(new Font("Arial", Font.PLAIN, 40));
                 b.setFocusPainted(false);
                 b.setFocusable(false);
-
+                b.setDefaultCapable(false);
                 b.setName(Integer.toString(count));
-
-//                for (int e : board.getIntArray()) {
-//                    if (e == count) {
-//                        b.setName(Integer.toString(num));
-//                        b.setFocusable(true);
-//                        b.setSize(4, 4);
-//                    }
-//                }
-
+                b.addActionListener(selectMove(b));
                 tttBoard.add(b);
 
                 System.out.println(count);
                 count++;
             }
         }
-
         frame.setVisible(true);
     }
 
-    public void makeGameBoard() {
+    private static ActionListener selectMove(JButton b) {
+        ActionListener action = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String curr = b.getText();
+                if (!curr.contains("X") && !curr.contains("O")) {
+                    b.setText("X");
+                    System.out.println("hi");
+                }
 
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        String user = userText.getText();
-        String password = passInput.getText();
-
-        if(user.equals("Jeff") & password.equals("1234")) {
-            success.setText("YOU DID IT");
-        } else {
-            success.setText("ERROR!!");
-        }
+            }
+        };
+        return action;
     }
 }
