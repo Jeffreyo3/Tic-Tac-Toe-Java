@@ -1,7 +1,6 @@
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Random;
@@ -17,7 +16,6 @@ public class GUI {
         board = new GameBoard();
         makeGameBoard();
         createComponentMap();
-        computerTurn();
 
     }
 
@@ -25,18 +23,24 @@ public class GUI {
         Random rNum = new Random();
         String cpuChoice = Integer.toString(rNum.nextInt(8));
         Component findButton = getComponentByName(cpuChoice);
+        if (findButton == null) {
+            throw new AssertionError();
+        }
         String text = ((JButton)findButton).getText();
 
         while (!checkSelected(text)) {
             cpuChoice = Integer.toString(rNum.nextInt(8));
             findButton = getComponentByName(cpuChoice);
+            assert findButton != null;
             text = ((JButton)findButton).getText();
-            System.out.println("hi");
-            System.out.println(cpuChoice);
         }
         ((JButton)findButton).setText("O");
-        ((JButton)findButton).setForeground(Color.ORANGE);
-
+        findButton.setForeground(Color.ORANGE);
+        board.addCpuChoice(Integer.parseInt(cpuChoice));
+        String result = board.checkWinner();
+        if (result.length() > 0) {
+            System.out.println(result);
+        }
     }
 
     private static void createComponentMap() {
@@ -88,10 +92,7 @@ public class GUI {
     }
 
     private static boolean checkSelected (String bTxt) {
-        System.out.println("checkSelected Text: " + bTxt);
-        Boolean bool = (!bTxt.contains("X") && !bTxt.contains("O"));
-        System.out.println(bool);
-        return bool;
+        return (!bTxt.contains("X") && !bTxt.contains("O"));
     }
 
     private static ActionListener selectMove(JButton b) {
@@ -99,6 +100,13 @@ public class GUI {
             if (checkSelected(b.getText())) {
                 b.setText("X");
                 b.setForeground(Color.CYAN);
+                board.addUserChoice(Integer.parseInt(b.getName()));
+                String result = board.checkWinner();
+                if (result.length() > 0) {
+                    System.out.println(result);
+                } else {
+                    computerTurn();
+                }
             }
         };
     }
