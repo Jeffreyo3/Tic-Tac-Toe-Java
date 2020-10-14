@@ -1,17 +1,19 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class GameBoard {
-    private char [][] gameBoard = {
+    private final char [][] gameBoard = new char[][]{
             {' ', ' ', ' '},
             {' ', ' ', ' '},
             {' ', ' ', ' '},
     };
-    private static HashMap componentMap = new HashMap<String, JButton>();
-    private List<Integer> userChoices = new ArrayList<>();
-    private List<Integer> cpuChoices = new ArrayList<>();
+
+    private static final HashMap<String, JButton> componentMap = new HashMap<>();
+
+    private final List<Integer> userChoices = new ArrayList<>();
+    private final List<Integer> cpuChoices = new ArrayList<>();
 
     public char[][] getGameBoard() {
         return gameBoard;
@@ -20,30 +22,27 @@ public class GameBoard {
     public static void createComponentMap(JPanel panel) {
         Component[] buttons = panel.getComponents();
         for (Component button : buttons) {
-            componentMap.put(button.getName(), button);
+            componentMap.put(button.getName(), (JButton)button);
         }
     }
 
     private static Component getComponentByName(String name) {
-        if (componentMap.containsKey(name)) {
-            return (Component) componentMap.get(name);
-        }
-        else return null;
+        return componentMap.getOrDefault(name, null);
     }
 
     public String checkWinner() {
-        List topRow = Arrays.asList(0, 1, 2);
-        List midRow = Arrays.asList(3, 4, 5);
-        List botRow = Arrays.asList(6, 7, 8);
+        List<Integer> topRow = Arrays.asList(0, 1, 2);
+        List<Integer> midRow = Arrays.asList(3, 4, 5);
+        List<Integer> botRow = Arrays.asList(6, 7, 8);
 
-        List topCol = Arrays.asList(0, 3, 6);
-        List midCol = Arrays.asList(1, 4, 7);
-        List botCol = Arrays.asList(2, 5, 8);
+        List<Integer> topCol = Arrays.asList(0, 3, 6);
+        List<Integer> midCol = Arrays.asList(1, 4, 7);
+        List<Integer> botCol = Arrays.asList(2, 5, 8);
 
-        List lTopRBot = Arrays.asList(0, 4, 8);
-        List lBotLTop = Arrays.asList(6, 4, 2);
+        List<Integer> lTopRBot = Arrays.asList(0, 4, 8);
+        List<Integer> lBotLTop = Arrays.asList(6, 4, 2);
 
-        List<List> winCond = new ArrayList<>();
+        List<List<Integer>> winCond = new ArrayList<>();
 
         winCond.add(topRow);
         winCond.add(midRow);
@@ -55,15 +54,14 @@ public class GameBoard {
         winCond.add(lBotLTop);
 
         boolean tie = false;
-        for(List l : winCond) {
-            if(userChoices.containsAll(l)) {
+        for(List<Integer> l : winCond)
+            if (userChoices.containsAll(l)) {
                 return "You WON!";
             } else if (cpuChoices.containsAll(l)) {
                 return "CPU wins :(";
             } else if (userChoices.size() + cpuChoices.size() == 9) {
                 tie = true;
             }
-        }
 
         if(tie) {
             return "TIE!";
@@ -73,24 +71,8 @@ public class GameBoard {
     }
 
 
-    public List<Integer> getUserChoices() {
-        return userChoices;
-    }
-
-    public void setUserChoices(List<Integer> userChoices) {
-        this.userChoices = userChoices;
-    }
-
     public void addUserChoice(Integer userChoice) {
         userChoices.add(userChoice);
-    }
-
-    public List<Integer> getCpuChoices() {
-        return cpuChoices;
-    }
-
-    public void setCpuChoices(List<Integer> cpuChoices) {
-        this.cpuChoices = cpuChoices;
     }
 
     public void addCpuChoice(Integer cpuChoice) {
