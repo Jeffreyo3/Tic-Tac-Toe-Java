@@ -1,65 +1,88 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
-public class GUI implements ActionListener {
+public class GUI {
 
-    private static JTextField userText;
-    private static JTextField passInput;
-    private static JLabel success;
-
+    private static JPanel gui;
+    private static JFrame frame;
+    private static JPanel tttBoard;
+    private static GameBoard board;
+    private static HashMap componentMap;
 
     public static void main(String[] args) {
-        JPanel panel = new JPanel();
-        JFrame frame = new JFrame();
-        frame.setSize(350, 200);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(panel);
 
-        panel.setLayout(null);
+        board = new GameBoard();
+        makeGameBoard();
+        createComponentMap();
+        System.out.println(getComponentByName("4"));
 
-        JLabel userLabel = new JLabel("User");
-        userLabel.setBounds(10, 20, 80, 25);
-        panel.add(userLabel);
-
-        userText = new JTextField(20);
-        userText.setBounds(100, 20, 165, 25);
-        panel.add(userText);
-
-        JLabel passLabel = new JLabel("Password");
-        passLabel.setBounds(10, 50, 80, 25);
-        panel.add(passLabel);
-
-        passInput = new JPasswordField(20);
-        passInput.setBounds(100, 50, 165, 25);
-        panel.add(passInput);
-
-        JButton button = new JButton("Submit");
-        button.setBounds(10, 80, 80, 25);
-        button.addActionListener(new GUI());
-        panel.add(button);
-
-        success = new JLabel("");
-        success.setBounds(10, 110, 300, 25);
-        panel.add(success);
-
-        frame.setVisible(true);
-
-        GameBoard board = new GameBoard();
-        char [][] layout = board.getGameBoard();
-        System.out.println(board);
-        System.out.println(layout[0].length);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        String user = userText.getText();
-        String password = passInput.getText();
-
-        if(user.equals("Jeff") & password.equals("1234")) {
-            success.setText("YOU DID IT");
-        } else {
-            success.setText("ERROR!!");
+    private static void createComponentMap() {
+        componentMap = new HashMap<String, JButton>();
+        Component[] buttons = tttBoard.getComponents();
+        for(int i=0; i<buttons.length; i++) {
+            componentMap.put(buttons[i].getName(), buttons[i]);
         }
+    }
+
+    private static Component getComponentByName(String name) {
+        if (componentMap.containsKey(name)) {
+            return (Component) componentMap.get(name);
+        }
+        else return null;
+    }
+
+    public static void makeGameBoard() {
+        gui = new JPanel(new BorderLayout(3, 3));
+        frame = new JFrame();
+        frame.setSize(400, 400);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(gui);
+        frame.setTitle("Tic-Tac-Toe by jeffreyo3");
+
+        tttBoard = new JPanel(new GridLayout(0,3));
+        tttBoard.setBorder(new LineBorder(Color.BLACK));
+        gui.add(tttBoard);
+
+        int count = 0;
+        for (char[] rows : board.getGameBoard()) {
+            for (char c : rows) {
+                JButton b = new JButton();
+                b.setBackground(Color.BLACK);
+                b.setText(Character.toString(c));
+                b.setForeground(Color.WHITE);
+                b.setFont(new Font("Arial", Font.PLAIN, 40));
+                b.setFocusPainted(false);
+                b.setFocusable(false);
+                b.setDefaultCapable(false);
+                b.setName(Integer.toString(count));
+                b.addActionListener(selectMove(b));
+                tttBoard.add(b);
+
+                System.out.println(count);
+                count++;
+            }
+        }
+        frame.setVisible(true);
+    }
+
+    private static ActionListener selectMove(JButton b) {
+        ActionListener action = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String curr = b.getText();
+                if (!curr.contains("X") && !curr.contains("O")) {
+                    b.setText("X");
+                    System.out.println("hi");
+                }
+
+            }
+        };
+        return action;
     }
 }
