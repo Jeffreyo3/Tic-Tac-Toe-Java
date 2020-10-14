@@ -1,5 +1,6 @@
-import java.util.ArrayList;
-import java.util.Arrays;
+import javax.swing.*;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
 
 public class GameBoard {
@@ -8,12 +9,26 @@ public class GameBoard {
             {' ', ' ', ' '},
             {' ', ' ', ' '},
     };
+    private static HashMap componentMap = new HashMap<String, JButton>();
     private List<Integer> userChoices = new ArrayList<>();
     private List<Integer> cpuChoices = new ArrayList<>();
 
-
     public char[][] getGameBoard() {
         return gameBoard;
+    }
+
+    public static void createComponentMap(JPanel panel) {
+        Component[] buttons = panel.getComponents();
+        for (Component button : buttons) {
+            componentMap.put(button.getName(), button);
+        }
+    }
+
+    private static Component getComponentByName(String name) {
+        if (componentMap.containsKey(name)) {
+            return (Component) componentMap.get(name);
+        }
+        else return null;
     }
 
     public String checkWinner() {
@@ -39,17 +54,22 @@ public class GameBoard {
         winCond.add(lTopRBot);
         winCond.add(lBotLTop);
 
+        boolean tie = false;
         for(List l : winCond) {
             if(userChoices.containsAll(l)) {
                 return "You WON!";
             } else if (cpuChoices.containsAll(l)) {
                 return "CPU wins :(";
-            } else if (userChoices.size() + cpuChoices.size() == 10 && !userChoices.containsAll(l) && !cpuChoices.containsAll(l)) {
-                return "TIE";
+            } else if (userChoices.size() + cpuChoices.size() == 9) {
+                tie = true;
             }
         }
 
-        return "";
+        if(tie) {
+            return "TIE!";
+        } else {
+            return "";
+        }
     }
 
 
@@ -77,6 +97,33 @@ public class GameBoard {
         cpuChoices.add(cpuChoice);
     }
 
+    public boolean checkSelected (String bTxt) {
+        return (!bTxt.contains("X") && !bTxt.contains("O"));
+    }
+
+    public static void computerTurn(GameBoard board) {
+        Random rNum = new Random();
+        String cpuChoice = Integer.toString(rNum.nextInt(8));
+        Component findButton = getComponentByName(cpuChoice);
+        if (findButton == null) {
+            throw new AssertionError();
+        }
+        String text = ((JButton)findButton).getText();
+
+        while (!board.checkSelected(text)) {
+            cpuChoice = Integer.toString(rNum.nextInt(8));
+            findButton = getComponentByName(cpuChoice);
+            assert findButton != null;
+            text = ((JButton)findButton).getText();
+        }
+        ((JButton)findButton).setText("O");
+        findButton.setForeground(Color.ORANGE);
+        board.addCpuChoice(Integer.parseInt(cpuChoice));
+        String result = board.checkWinner();
+        if (result.length() > 0) {
+            System.out.println(result);
+        }
+    }
 
     @Override
     public String toString() {
