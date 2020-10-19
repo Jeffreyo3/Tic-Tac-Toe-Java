@@ -14,8 +14,34 @@ public class GameBoard {
 
     private final List<Integer> userChoices = new ArrayList<>();
     private final List<Integer> cpuChoices = new ArrayList<>();
+    List<List<Integer>> winCond = new ArrayList<>();
+
+
+
+    public GameBoard() {
+        List<Integer> topRow = Arrays.asList(0, 1, 2);
+        List<Integer> midRow = Arrays.asList(3, 4, 5);
+        List<Integer> botRow = Arrays.asList(6, 7, 8);
+
+        List<Integer> topCol = Arrays.asList(0, 3, 6);
+        List<Integer> midCol = Arrays.asList(1, 4, 7);
+        List<Integer> botCol = Arrays.asList(2, 5, 8);
+
+        List<Integer> lTopRBot = Arrays.asList(0, 4, 8);
+        List<Integer> lBotLTop = Arrays.asList(6, 4, 2);
+
+        this.winCond.add(topRow);
+        this.winCond.add(midRow);
+        this.winCond.add(botRow);
+        this.winCond.add(topCol);
+        this.winCond.add(midCol);
+        this.winCond.add(botCol);
+        this.winCond.add(lTopRBot);
+        this.winCond.add(lBotLTop);
+    }
 
     public char[][] getGameBoard() {
+
         return gameBoard;
     }
 
@@ -31,30 +57,8 @@ public class GameBoard {
     }
 
     public String checkWinner() {
-        List<Integer> topRow = Arrays.asList(0, 1, 2);
-        List<Integer> midRow = Arrays.asList(3, 4, 5);
-        List<Integer> botRow = Arrays.asList(6, 7, 8);
-
-        List<Integer> topCol = Arrays.asList(0, 3, 6);
-        List<Integer> midCol = Arrays.asList(1, 4, 7);
-        List<Integer> botCol = Arrays.asList(2, 5, 8);
-
-        List<Integer> lTopRBot = Arrays.asList(0, 4, 8);
-        List<Integer> lBotLTop = Arrays.asList(6, 4, 2);
-
-        List<List<Integer>> winCond = new ArrayList<>();
-
-        winCond.add(topRow);
-        winCond.add(midRow);
-        winCond.add(botRow);
-        winCond.add(topCol);
-        winCond.add(midCol);
-        winCond.add(botCol);
-        winCond.add(lTopRBot);
-        winCond.add(lBotLTop);
-
         boolean tie = false;
-        for(List<Integer> l : winCond)
+        for(List<Integer> l : winCond) {
             if (userChoices.containsAll(l)) {
                 return "You WON!";
             } else if (cpuChoices.containsAll(l)) {
@@ -62,6 +66,7 @@ public class GameBoard {
             } else if (userChoices.size() + cpuChoices.size() == 9) {
                 tie = true;
             }
+        }
 
         if(tie) {
             return "TIE!";
@@ -69,7 +74,29 @@ public class GameBoard {
             return "";
         }
     }
-
+    public int cpuDefense(GameBoard board) {
+        System.out.println("===========");
+        for(List<Integer> l: board.winCond) {
+            System.out.println("CURRENT LIST: " + l);
+            int count = 0;
+            int missing = 0;
+            for(Integer i:l){
+                if(board.userChoices.contains(i)) {
+                    System.out.println("USER " + board.userChoices + "| ITEM " + i);
+                    count++;
+                } else if (!board.cpuChoices.contains(i)) {
+                    System.out.println("CPU " + board.cpuChoices + "| ITEM " + i + "| COUNT " + count);
+                    missing = i;
+                }
+            }
+            if(count == 2) {
+                if (!board.userChoices.contains(missing) && !board.cpuChoices.contains(missing)) {
+                    return missing;
+                }
+            }
+        }
+        return -1;
+    }
 
     public void addUserChoice(Integer userChoice) {
         userChoices.add(userChoice);
@@ -84,21 +111,32 @@ public class GameBoard {
     }
 
     public static void computerTurn(GameBoard board) {
-        Random rNum = new Random();
-        String cpuChoice = Integer.toString(rNum.nextInt(8));
-        Component findButton = getComponentByName(cpuChoice);
-        if (findButton == null) {
-            throw new AssertionError();
-        }
-        String text = ((JButton)findButton).getText();
+        String cpuChoice = Integer.toString(board.cpuDefense(board));
+        Component findButton;
 
-        while (!board.checkSelected(text)) {
+        if (cpuChoice.equals("-1")) {
+            Random rNum = new Random();
             cpuChoice = Integer.toString(rNum.nextInt(8));
             findButton = getComponentByName(cpuChoice);
-            assert findButton != null;
-            text = ((JButton)findButton).getText();
+            if (findButton == null) {
+                throw new AssertionError();
+            }
+            String text = ((JButton) findButton).getText();
+
+            while (!board.checkSelected(text)) {
+                cpuChoice = Integer.toString(rNum.nextInt(8));
+                findButton = getComponentByName(cpuChoice);
+                assert findButton != null;
+                text = ((JButton) findButton).getText();
+            }
+        } else {
+            findButton = getComponentByName(cpuChoice);
         }
-        ((JButton)findButton).setText("O");
+        setButtonText(board, cpuChoice, findButton);
+    }
+
+    private static void setButtonText(GameBoard board, String cpuChoice, Component findButton) {
+        ((JButton) findButton).setText("O");
         findButton.setForeground(Color.ORANGE);
         board.addCpuChoice(Integer.parseInt(cpuChoice));
         String result = board.checkWinner();
